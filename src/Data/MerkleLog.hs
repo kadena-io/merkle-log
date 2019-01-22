@@ -20,7 +20,35 @@
 -- the description in RFC 6962. Extending a Merkle tree requires chaining a
 -- logarithmic number of nodes at the end of the tree.
 --
--- TODO:
+-- The API requires the usage of type applications which can be enabled with the
+-- following pragma.
+--
+-- @
+--     {-# LANGUAGE TypeApplications #-}
+-- @
+--
+-- ** Example
+--
+-- @
+--     {-# LANGUAGE TypeApplications #-}
+--     {-# LANGUAGE OverloadedStrings #-}
+--
+--     import qualified Data.ByteString as B
+--     import Crypto.Hash.Algorithms (SHA512t_256)
+--
+--     inputs = ["a", "b", "c"] :: [B.ByteString]
+--
+--     -- create tree
+--     t = merkleTree @SHA512t_256 inputs
+--
+--     -- create inclusion proof
+--     p = either (error . show) id $ merkleProof 1 (inputs !! 1) t
+--
+--     -- verify proof
+--     runMerkleProof p == merkleRoot t
+-- @
+--
+-- ** TODO
 --
 -- * implement extension of trees (possibly by linking memory chunks of maximal full trees)
 --   (how important is this?)
@@ -33,7 +61,6 @@
 -- * Resolve all TODOs and FIXMEs
 -- * reduce dependency on memory package by storing everything in
 --   (pinned) 'B.ByteString's or unpinned 'BA.ByteArray's
--- * put on Hackage?
 --
 module Data.MerkleLog
 (
