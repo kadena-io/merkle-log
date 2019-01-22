@@ -27,7 +27,7 @@ module Main
 
 import Control.DeepSeq
 
-import Crypto.Hash.Algorithms (SHA512t_256)
+import Crypto.Hash.Algorithms (SHA512t_256, HashAlgorithm)
 
 import Data.Bifoldable
 import qualified Data.ByteArray as BA
@@ -56,6 +56,10 @@ properties =
     , ("create and verify merkle proof", property prop_proof)
     , ("create and verify merkle proof for all tree items for tree of size 30", prop_proofExhaustive 30)
     , ("create and verify merkle proof for tree of size 1000 with items of sizes up to 1000 bytes", prop_proofSize 1000 1000)
+    , ("creating proof for invalid input fails", property prop_proofInvalidInput)
+    , ("running proof with invalid subject fails", property prop_proofInvalidSubject)
+    , ("running proof with invalid object path fails", property prop_proofInvalidObjectPath)
+    , ("runnng proof with invalid object hash fails", property prop_proofInvalidObjectHash)
     , ("encoding roundtrip for merkle proof object", property prop_encodeProofObject)
     , ("encoding roundtrip for merkle root", property prop_encodeMerkleRoot)
     , ("encoding roundtrip for merkle tree", property prop_encodeMerkleTree)
@@ -67,6 +71,32 @@ properties =
 nodeCount :: Int -> Int
 nodeCount i = max 1 (2 * i - 1)
 {-# INLINE nodeCount #-}
+
+-- | Change diretion of first proof step. Throws error is the proof
+-- is empty (singleton tree).
+--
+changeProofPath :: HashAlgorithm a => MerkleProof a -> MerkleProof a
+changeProofPath p = p { _merkleProofObject = o }
+  where
+    Right o = decodeMerkleProofObject . BA.pack @BA.Bytes
+        $ case BA.unpack (_merkleProofObject p) of
+            (0x00 : t) -> 0x01 : t
+            (0x01 : t) -> 0x00 : t
+            (_ : _) -> error "invalid proof object"
+            [] -> error "unexpected empty proof object"
+
+
+-- | Change hash of first proof step. Throws error is the proof
+-- is empty (singleton tree).
+--
+changeProofHash :: HashAlgorithm a => MerkleProof a -> MerkleProof a
+changeProofHash p = p { _merkleProofObject = o }
+  where
+    Right o = decodeMerkleProofObject . BA.pack @BA.Bytes
+        $ case BA.unpack (_merkleProofObject p) of
+            (h1 : h2 : t) -> h1 : succ h2 : t
+            [] -> error "unexpected empty proof object"
+            _ -> error "invalid proof object"
 
 -- -------------------------------------------------------------------------- --
 -- Properties
@@ -104,6 +134,43 @@ prop_proofSize n m = once $ do
     i <- choose (0, n - 1)
     return $ prop_proof l (NonNegative i)
 
+prop_proofInvalidInput :: [[Word8]] -> NonNegative Int -> Property
+prop_proofInvalidInput a (NonNegative i) = i < length a
+    ==> case merkleProof i "a" (merkleTree @SHA512t_256 (B.pack <$> a)) of
+        Left _ -> True
+        Right _ -> False
+
+prop_proofInvalidSubject :: [[Word8]] -> NonNegative Int -> Property
+prop_proofInvalidSubject a (NonNegative i) = i < length a
+    ==> runMerkleProof p' =/= merkleRoot t
+  where
+    l = B.pack <$> a
+    t = merkleTree @SHA512t_256 l
+    p = case merkleProof i (l !! i) t of
+        Left e -> error e
+        Right x -> x
+    p' = p { _merkleProofSubject = MerkleProofSubject "a" }
+
+prop_proofInvalidObjectPath :: [[Word8]] -> NonNegative Int -> Property
+prop_proofInvalidObjectPath a (NonNegative i) = length a > 1 && i < length a
+    ==> runMerkleProof (changeProofPath p) =/= merkleRoot t
+  where
+    l = B.pack <$> a
+    t = merkleTree @SHA512t_256 l
+    p = case merkleProof i (l !! i) t of
+        Left e -> error e
+        Right x -> x
+
+prop_proofInvalidObjectHash :: [[Word8]] -> NonNegative Int -> Property
+prop_proofInvalidObjectHash a (NonNegative i) = length a > 1 && i < length a
+    ==> runMerkleProof (changeProofHash p) =/= merkleRoot t
+  where
+    l = B.pack <$> a
+    t = merkleTree @SHA512t_256 l
+    p = case merkleProof i (l !! i) t of
+        Left e -> error e
+        Right x -> x
+
 prop_encodeProofObject :: NonEmptyList [Word8] -> NonNegative Int -> Property
 prop_encodeProofObject a (NonNegative i) = i < length l
     ==> Right po === decodeMerkleProofObject (encodeMerkleProofObject @BA.Bytes po)
@@ -111,8 +178,8 @@ prop_encodeProofObject a (NonNegative i) = i < length l
     l = B.pack <$> getNonEmpty a
     t = merkleTree @SHA512t_256 l
     p = case merkleProof i (l !! i) t of
-            Left e -> error e
-            Right x -> x
+        Left e -> error e
+        Right x -> x
     po = _merkleProofObject p
 
 prop_encodeMerkleRoot :: NonEmptyList [Word8] -> Property
