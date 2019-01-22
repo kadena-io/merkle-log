@@ -101,6 +101,7 @@ instance Show (MerkleHash a) where
 
 hashSize :: forall a c . HashAlgorithm a => Num c => c
 hashSize = fromIntegral $ hashDigestSize @a undefined
+    -- the 'undefined' argument is a type proxy that isn't evaluated
 {-# INLINE hashSize #-}
 
 decodeMerkleHash
