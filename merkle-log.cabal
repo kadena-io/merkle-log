@@ -23,7 +23,7 @@ library
     exposed-modules:
         Data.MerkleLog
     build-depends:
-          base >=4.12
+          base >=4.11
         , bytestring >=0.10
         , cryptonite >=0.25
         , deepseq >=1.4
