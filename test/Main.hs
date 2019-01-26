@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -41,6 +42,23 @@ import Test.QuickCheck
 -- internal modules
 
 import Data.MerkleLog
+
+-- -------------------------------------------------------------------------- --
+-- Support for QuickCheck < 2.12
+
+#if ! MIN_VERSION_QuickCheck(2,12,0)
+infix 4 =/=
+(=/=) :: (Eq a, Show a) => a -> a -> Property
+x =/= y = counterexample (show x ++ interpret res ++ show y) res
+  where
+    res = x /= y
+    interpret True  = " /= "
+    interpret False = " == "
+
+isSuccess :: Result -> Bool
+isSuccess Success{} = True
+isSuccess _ = False
+#endif
 
 -- -------------------------------------------------------------------------- --
 -- Main
