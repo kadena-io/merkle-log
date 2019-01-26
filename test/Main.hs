@@ -29,11 +29,12 @@ import Control.DeepSeq
 
 import Crypto.Hash.Algorithms (SHA512t_256, HashAlgorithm)
 
-import Data.Bifoldable
+import Data.Bitraversable
 import qualified Data.ByteArray as BA
 import qualified Data.ByteString as B
-import Data.Foldable
 import Data.Word
+
+import System.Exit
 
 import Test.QuickCheck
 
@@ -45,7 +46,11 @@ import Data.MerkleLog
 -- Main
 
 main :: IO ()
-main = traverse_ (bitraverse_ print quickCheck) properties
+main = do
+    results <- traverse (bitraverse print quickCheckResult) properties
+    if and $ isSuccess . snd <$> results
+        then exitSuccess
+        else exitFailure
 
 -- | Properties
 --
@@ -59,7 +64,7 @@ properties =
     , ("creating proof for invalid input fails", property prop_proofInvalidInput)
     , ("running proof with invalid subject fails", property prop_proofInvalidSubject)
     , ("running proof with invalid object path fails", property prop_proofInvalidObjectPath)
-    , ("runnng proof with invalid object hash fails", property prop_proofInvalidObjectHash)
+    , ("runnig proof with invalid object hash fails", property prop_proofInvalidObjectHash)
     , ("encoding roundtrip for merkle proof object", property prop_encodeProofObject)
     , ("encoding roundtrip for merkle root", property prop_encodeMerkleRoot)
     , ("encoding roundtrip for merkle tree", property prop_encodeMerkleTree)
@@ -94,7 +99,7 @@ changeProofHash p = p { _merkleProofObject = o }
   where
     Right o = decodeMerkleProofObject . BA.pack @BA.Bytes
         $ case BA.unpack (_merkleProofObject p) of
-            (h1 : h2 : t) -> h1 : succ h2 : t
+            (h1 : h2 : t) -> h1 : 1 + h2 : t
             [] -> error "unexpected empty proof object"
             _ -> error "invalid proof object"
 
