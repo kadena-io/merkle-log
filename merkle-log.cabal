@@ -2,7 +2,7 @@ cabal-version: 2.2
 name: merkle-log
 version: 0.1.0.0
 synopsis: Merkle Tree Logs
-description: A implementation of Merkle Trees from RFC 6962
+description: Binary Merkle Trees
 homepage: https://github.com/kadena-io/merkle-log
 bug-reports: https://github.com/kadena-io/merkle-log/issues
 license: BSD-3-Clause
@@ -27,7 +27,9 @@ library
         , bytestring >=0.10
         , cryptonite >=0.25
         , deepseq >=1.4
+        , exceptions >=0.10
         , memory >=0.14
+        , text >=1.2
 
 test-suite test
     type: exitcode-stdio-1.0
@@ -48,6 +50,7 @@ test-suite test
         , bytestring >=0.10
         , cryptonite >=0.25
         , deepseq >=1.4
+        , exceptions >=0.10
         , memory >=0.14
 
 benchmark benchmarks

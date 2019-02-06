@@ -209,10 +209,10 @@ instance HashAlgorithm a => Impl (ML a) where
     type Root (ML a) = ML.MerkleRoot a
 
     label = "merkle-log"
-    tree = ML.merkleTree @a
+    tree = ML.merkleTree @a . fmap ML.InputNode
     root = ML.merkleRoot
     proof t ix i =
-        let Right p = ML.merkleProof i ix t
+        let Right p = ML.merkleProof (ML.InputNode ix) i t
         in MLProof p (ML.merkleRoot t)
     verify (MLProof p r) = ML.runMerkleProof p == r
 
