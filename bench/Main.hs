@@ -70,6 +70,9 @@ main = defaultMain
                 , createBench @(HT SHA3_256) e
                 , createBench @MT e
                 ]
+            , bgroup "BLAKE2b_256"
+                [ createBench @(ML Blake2b_256) e
+                ]
             ]
         , bgroup "create inclusion proof"
             [ bgroup "SHA512t_256"
@@ -85,6 +88,9 @@ main = defaultMain
                 , proofBench @(HT SHA3_256) e
                 , proofBench @MT e
                 ]
+            , bgroup "BLAKE2b_256"
+                [ proofBench @(ML Blake2b_256) e
+                ]
             ]
         , bgroup "verify inclusion proof"
             [ bgroup "SHA512t_256"
@@ -99,6 +105,9 @@ main = defaultMain
                 [ verifyBench @(ML SHA3_256) e
                 , verifyBench @(HT SHA3_256) e
                 , verifyBench @MT e
+                ]
+            , bgroup "BLAKE2b_256"
+                [ verifyBench @(ML Blake2b_256) e
                 ]
             ]
         ]
