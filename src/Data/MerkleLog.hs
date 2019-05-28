@@ -167,11 +167,14 @@ data MerkleTreeException
     | InputNotInTreeException T.Text Int B.ByteString
     | MerkleRootNotInTreeException T.Text Int B.ByteString
     | InvalidProofObjectException T.Text
-    deriving (Show, Eq, Generic)
+    deriving (Eq, Generic)
     deriving anyclass (NFData)
 
 instance Exception MerkleTreeException where
     displayException = T.unpack . textMessage
+
+instance Show MerkleTreeException where
+    show = T.unpack . textMessage
 
 -- | Display 'MerkleTreeException' values as text messages.
 --
