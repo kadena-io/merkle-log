@@ -1,13 +1,23 @@
 # Haskell Implementation of Merkle Tree Logs
 
-This packages implements Merkle Tree Logs as described in RFC 6962 in Haskell.
+This packages implements Merkle Tree Logs similar to those described in RFC 6962
+in Haskell.
+
+Merkle Logs are a append-only data structure. The tree layout in this
+implementation of Merkle trees is based on the description of Merkle trees in
+RFC 6962. With this tree layout extending a Merkle tree requires chaining a
+logarithmic number of nodes at the end of the tree. Unlike RFC 6962 the Merkle
+trees in this module support the creation of unbalanced MerkleTrees by nesting
+sub-trees as leafs of Merkle trees. Also, unlike RFC 6962 this module generates
+fully self-contained inclusion proofs that don't rely on the client being aware
+of the balancing of the Merkle Tree that was used to generate the proof.
 
 ## Format
 
 The implementation stores Merkle trees in a packed format in memory. This allows
 for efficient construction, serialization, and querying. Trees are opaque
 objects that are allocated and deallocated as well as serialized and
-deserialized as a whole, which matches many use cases. Also, trees can be easily
+deserialized as a whole, which matches many use cases. Also, trees can be
 nested, by building larger Merkle trees that have smaller trees as inputs to
 their leafs.
 

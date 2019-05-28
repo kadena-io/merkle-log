@@ -23,7 +23,7 @@
 -- implementation of Merkle trees is based on the description of Merkle trees in
 -- RFC 6962. With this tree layout extending a Merkle tree requires chaining a
 -- logarithmic number of nodes at the end of the tree. Unlike RFC 6962 the
--- Merkle trees in this module support the creation unbalanced MerkleTrees by
+-- Merkle trees in this module support the creation of unbalanced MerkleTrees by
 -- nesting sub-trees as leafs of Merkle trees. Also, unlike RFC 6962 this module
 -- generates fully self-contained inclusion proofs that don't rely on the client
 -- being aware of the balancing of the Merkle Tree that was used to generate the
