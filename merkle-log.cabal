@@ -11,6 +11,9 @@ author: Lars Kuhtz
 maintainer: Lars Kuhtz <lars@kadena.io>
 copyright: Copyright (c) 2019, Kadena LLC
 category: Data
+tested-with:
+      GHC==8.6.5
+    , GHC==8.4.4
 extra-source-files:
     README.md
     CHANGELOG.md

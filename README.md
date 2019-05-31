@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/kadena-io/merkle-log.svg?branch=master)](https://travis-ci.org/kadena-io/merkle-log)
+
 # Haskell Implementation of Merkle Tree Logs
 
 This packages implements Merkle Tree Logs similar to those described in RFC 6962
