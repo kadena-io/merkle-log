@@ -30,14 +30,12 @@ import Criterion
 import Criterion.Main
 
 import Crypto.Hash
-import qualified Crypto.Hash.MerkleTree as MT
 
 import qualified Data.ByteArray as BA
 import qualified Data.ByteString as B
 import Data.ByteString.Random.MWC
 import qualified Data.HashTree as HT
 import Data.Maybe
-import Data.Serialize (encode)
 
 import GHC.Generics
 
@@ -68,7 +66,6 @@ main = defaultMain
             , bgroup "SHA3_256"
                 [ createBench @(ML SHA3_256) e
                 , createBench @(HT SHA3_256) e
-                , createBench @MT e
                 ]
             , bgroup "BLAKE2b_256"
                 [ createBench @(ML Blake2b_256) e
@@ -86,7 +83,6 @@ main = defaultMain
             , bgroup "SHA3_256"
                 [ proofBench @(ML SHA3_256) e
                 , proofBench @(HT SHA3_256) e
-                , proofBench @MT e
                 ]
             , bgroup "BLAKE2b_256"
                 [ proofBench @(ML Blake2b_256) e
@@ -104,7 +100,6 @@ main = defaultMain
             , bgroup "SHA3_256"
                 [ verifyBench @(ML SHA3_256) e
                 , verifyBench @(HT SHA3_256) e
-                , verifyBench @MT e
                 ]
             , bgroup "BLAKE2b_256"
                 [ verifyBench @(ML Blake2b_256) e
@@ -224,59 +219,6 @@ instance HashAlgorithm a => Impl (ML a) where
         let Right p = ML.merkleProof (ML.InputNode ix) i t
         in MLProof p (ML.merkleRoot t)
     verify (MLProof p r) = ML.runMerkleProof p == r
-
-    {-# INLINE label #-}
-    {-# INLINE tree #-}
-    {-# INLINE root #-}
-    {-# INLINE proof #-}
-    {-# INLINE verify #-}
-
--- -------------------------------------------------------------------------- --
--- merkle-tree package
-
-data MTProof = MTProof
-    !(MT.MerkleProof B.ByteString)
-    {-# UNPACK #-} !B.ByteString
-        -- ^ Proof subject (leaf)
-    {-# UNPACK #-} !(MT.MerkleRoot B.ByteString)
-        -- ^ Root of the Tree
-
--- | The merkle-tree package doesn't export the 'ProofElem'. Without that the
--- 'Generic' instance for 'MT.MerkleProof' become almost useless. In particular
--- we can't define an 'NFData' instance.
---
--- This instance is a workaround that probably leads to worse benchmark results.
---
-instance NFData MTProof where
-    -- rnf (MTProof p subj r) = rnf
-    --     $ MT.validateMerkleProof p r $ MT.mkLeafRootHash subj
-    rnf (MTProof p _ _) = rnf $ encode p
-    {-# INLINE rnf #-}
-
-instance NFData (MT.MerkleRoot B.ByteString) where
-    rnf r = rnf (MT.getMerkleRoot r)
-    {-# INLINE rnf #-}
-
-instance NFData (MT.MerkleTree B.ByteString) where
-    rnf t = rnf $ MT.mtRoot t
-    {-# INLINE rnf #-}
-
-data MT
-
-instance Impl MT where
-    type Tree MT = MT.MerkleTree B.ByteString
-    type Proof MT = MTProof
-    type Root MT = MT.MerkleRoot B.ByteString
-
-    label = "merkle-tree"
-    tree = MT.mkMerkleTree
-    root = MT.mtRoot
-    proof t subj _ = MTProof
-        (MT.merkleProof t (MT.mkLeafRootHash subj))
-        subj
-        (MT.mtRoot t)
-    verify (MTProof p subj r)
-        = MT.validateMerkleProof p r (MT.mkLeafRootHash subj)
 
     {-# INLINE label #-}
     {-# INLINE tree #-}
