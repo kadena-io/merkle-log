@@ -114,7 +114,6 @@ import Control.Monad
 import Control.Monad.Catch
 
 import Crypto.Hash (hash)
-import Crypto.Hash.Algorithms (HashAlgorithm)
 import Crypto.Hash.IO
 
 import qualified Data.ByteArray as BA
