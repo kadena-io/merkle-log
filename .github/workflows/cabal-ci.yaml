@@ -2,9 +2,6 @@ name: Build with Cabal
 
 on: 
   push:
-    branches: 
-      - "*"
-  pull_request:
   schedule:
     - cron: '0 8 * * *'
 
@@ -66,4 +63,3 @@ jobs:
     # Tests
     - name: Run Tests
       run: cabal v2-test
-
