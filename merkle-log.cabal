@@ -1,4 +1,4 @@
-cabal-version: 2.2
+cabal-version: 2.4
 name: merkle-log
 version: 0.1.0.0
 synopsis: Merkle Tree Logs
@@ -12,9 +12,9 @@ maintainer: Lars Kuhtz <lars@kadena.io>
 copyright: Copyright (c) 2019, Kadena LLC
 category: Data
 tested-with:
-      GHC==8.10.1
-    , GHC==8.8.3
-    , GHC==8.6.5
+    GHC==9.0.1
+    GHC==8.10.5
+    GHC==8.8.4
 extra-source-files:
     README.md
     CHANGELOG.md
@@ -31,7 +31,7 @@ library
     exposed-modules:
         Data.MerkleLog
     build-depends:
-          base >=4.11 && <5
+        , base >=4.11 && <5
         , bytestring >=0.10
         , cryptonite >=0.25
         , deepseq >=1.4
@@ -50,7 +50,7 @@ test-suite test
     main-is: Main.hs
     build-depends:
         -- internal
-          merkle-log
+        , merkle-log
 
         -- external
         , QuickCheck >=2.11
@@ -72,7 +72,7 @@ benchmark benchmarks
     main-is: Main.hs
     build-depends:
         -- internal
-          merkle-log
+        , merkle-log
 
         -- external
         , QuickCheck >=2.11
