@@ -1,6 +1,6 @@
 cabal-version: 2.4
 name: merkle-log
-version: 0.1.1
+version: 0.2.0
 synopsis: Merkle Tree Logs
 description: Binary Merkle Trees
 homepage: https://github.com/kadena-io/merkle-log
@@ -9,12 +9,14 @@ license: BSD-3-Clause
 license-file: LICENSE
 author: Lars Kuhtz
 maintainer: Lars Kuhtz <lars@kadena.io>
-copyright: Copyright (c) 2019, Kadena LLC
+copyright: Copyright (c) 2019-2023, Kadena LLC
 category: Data
 tested-with:
-    GHC==9.0.1
-    GHC==8.10.5
-    GHC==8.8.4
+    GHC==9.6
+    GHC==9.4
+    GHC==9.2
+    GHC==9.0
+    GHC==8.10
 extra-source-files:
     README.md
     CHANGELOG.md
