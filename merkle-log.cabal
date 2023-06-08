@@ -33,7 +33,7 @@ library
     build-depends:
         , base >=4.11 && <5
         , bytestring >=0.10
-        , cryptonite >=0.25
+        , crypton >=0.31
         , deepseq >=1.4
         , exceptions >=0.10
         , memory >=0.14
@@ -56,7 +56,7 @@ test-suite test
         , QuickCheck >=2.11
         , base >=4.11 && <5
         , bytestring >=0.10
-        , cryptonite >=0.25
+        , crypton >=0.31
         , deepseq >=1.4
         , exceptions >=0.10
         , memory >=0.14
@@ -79,7 +79,8 @@ benchmark benchmarks
         , base >=4.11 && <5
         , bytestring >=0.10
         , criterion >=1.5
-        , cryptonite >=0.25
+        , crypton >=0.31
+        , cryptonite >=0.30
         , deepseq >=1.4
         , hash-tree >=0.0
         , memory >=0.14
