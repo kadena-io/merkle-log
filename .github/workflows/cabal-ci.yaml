@@ -1,6 +1,7 @@
 name: Build with Cabal
 
-on: 
+on:
+  workflow_dispatch:
   push:
   schedule:
     - cron: '0 8 * * *'
@@ -13,17 +14,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ghc: ['8.8.4', '8.10.5', '9.0.1']
-        cabal: ['3.4']
-        os: ['ubuntu-18.04', 'ubuntu-20.04', 'macOS-latest']
+        ghc: ['8.10', '9.0', '9.2', '9.4', '9.6']
+        cabal: ['3.10']
+        os: ['ubuntu-22.04', 'ubuntu-20.04', 'macOS-latest']
 
     steps:
 
     # Setup
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install GHC and Cabal
-      uses: haskell/actions/setup@v1.2.3
+      uses: haskell/actions/setup@v2
       with:
          ghc-version: ${{ matrix.ghc }}
          cabal-version: ${{ matrix.cabal }}
@@ -37,14 +38,14 @@ jobs:
         EOF
 
     # Restore Packages from Caches
-    - uses: actions/cache@v2.1.6
+    - uses: actions/cache@v3
       name: Cache dist-newstyle
       with:
         path: |
           ~/.cabal/packages
           ~/.cabal/store
           dist-newstyle
-        key: ${{ matrix.os }}-${{ matrix.ghc }}-0-cabal
+        key: ${{ matrix.os }}-${{ matrix.ghc }}-cabal
 
     # Build
     - name: Update package database
