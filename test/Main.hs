@@ -107,27 +107,31 @@ nodeCount i = max 1 (2 * i - 1)
 -- is empty (singleton tree).
 --
 changeProofPath :: HashAlgorithm a => MerkleProof a -> MerkleProof a
-changeProofPath p = p { _merkleProofObject = o }
+changeProofPath p = p { _merkleProofObject = obj }
   where
-    Right o = decodeMerkleProofObject . BA.pack @BA.Bytes
-        $ case splitAt 12 (BA.unpack (_merkleProofObject p)) of
-            (h, 0x00 : t) -> h <> (0x01 : t)
-            (h, 0x01 : t) -> h <> (0x00 : t)
-            (_, _ : _) -> error "invalid proof object"
-            (_, []) -> error "unexpected empty proof object"
+    obj = case decodeMerkleProofObject (BA.pack @BA.Bytes o) of
+        Right x -> x
+        Left e -> error $ "test/Main.chainProofPath: failed to decode proof object: " <> show e
+    o = case splitAt 12 (BA.unpack (_merkleProofObject p)) of
+        (h, 0x00 : t) -> h <> (0x01 : t)
+        (h, 0x01 : t) -> h <> (0x00 : t)
+        (_, _ : _) -> error "invalid proof object"
+        (_, []) -> error "unexpected empty proof object"
 
 
 -- | Change hash of first proof step. Throws error is the proof
 -- is empty (singleton tree).
 --
 changeProofHash :: HashAlgorithm a => MerkleProof a -> MerkleProof a
-changeProofHash p = p { _merkleProofObject = o }
+changeProofHash p = p { _merkleProofObject = obj }
   where
-    Right o = decodeMerkleProofObject . BA.pack @BA.Bytes
-        $ case splitAt 12 (BA.unpack (_merkleProofObject p)) of
-            (h, h1 : h2 : t) -> h <> (h1 : 1 + h2 : t)
-            (_, []) -> error "unexpected empty proof object"
-            _ -> error "invalid proof object"
+    obj = case decodeMerkleProofObject (BA.pack @BA.Bytes o) of
+        Right x -> x
+        Left e -> error $ "test/Main.chainProofHash: failed to decode proof object: " <> show e
+    o = case splitAt 12 (BA.unpack (_merkleProofObject p)) of
+        (h, h1 : h2 : t) -> h <> (h1 : 1 + h2 : t)
+        (_, []) -> error "unexpected empty proof object"
+        _ -> error "invalid proof object"
 
 -- | Changes the proof step count and verifies that decoding of the modified proof object fails.
 -- Throws error is the proof is empty (singleton tree).
@@ -307,7 +311,9 @@ prop_chainProof :: MerkleTreeChain SHA512t_256 -> Property
 prop_chainProof (MerkleTreeChain l)
     = runMerkleProof @SHA512t_256 p === merkleRoot (snd $ NE.last l)
   where
-    Right p = merkleProof_ (InputNode "a") l
+    p = case merkleProof_ (InputNode "a") l of
+        Right x -> x
+        Left e -> error $ "test/Main.prop_chainProof: merkleProof failed: " <> show e
 
 prop_encodeProofObject :: MerkleProof SHA512t_256 -> Property
 prop_encodeProofObject p
