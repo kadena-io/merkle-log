@@ -249,7 +249,7 @@ prop_proofInvalidInput
     :: [MerkleNodeType SHA512t_256 B.ByteString]
     -> NonNegative Int
     -> Property
-prop_proofInvalidInput a (NonNegative i) = i < length a
+prop_proofInvalidInput a (NonNegative i) = i < length a && notElem (InputNode "a") a
     ==> case merkleProof (InputNode "a") i (merkleTree @SHA512t_256 a) of
         Left _ -> True
         Right _ -> False
