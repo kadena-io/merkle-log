@@ -267,7 +267,7 @@ prop_proofInvalidSubject l (NonNegative i) = i < length l
         Right x -> x
     p' = p { _merkleProofSubject = changeSubject (_merkleProofSubject p) }
     changeSubject (MerkleProofSubject (InputNode "a")) = MerkleProofSubject (InputNode "b")
-    changeSubject _ = MerkleProofSubject (InputNode "b")
+    changeSubject _ = MerkleProofSubject (InputNode "a")
 
 prop_proofInvalidObjectPath
     :: UniqueInputs SHA512t_256
