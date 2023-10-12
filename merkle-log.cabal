@@ -12,11 +12,11 @@ maintainer: Lars Kuhtz <lars@kadena.io>
 copyright: Copyright (c) 2019-2023, Kadena LLC
 category: Data
 tested-with:
+    GHC==9.8
     GHC==9.6
     GHC==9.4
     GHC==9.2
     GHC==9.0
-    GHC==8.10
 extra-source-files:
     README.md
     CHANGELOG.md
