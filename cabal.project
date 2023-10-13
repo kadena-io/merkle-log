@@ -1,0 +1,20 @@
+packages: merkle-log.cabal
+optimization: 2
+
+-- The following are all dependencies of GHC. 
+--
+allow-newer: *:Cabal
+allow-newer: *:Cabal-syntax
+allow-newer: *:array
+allow-newer: *:base
+allow-newer: *:bytestring
+allow-newer: *:deepseq
+allow-newer: *:ghc
+allow-newer: *:ghc-boot-th
+allow-newer: *:ghc-prim
+allow-newer: *:integer-gmp
+allow-newer: *:pretty
+allow-newer: *:template-haskell
+allow-newer: *:text
+
+constraints: aeson>2

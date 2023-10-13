@@ -12,11 +12,11 @@ maintainer: Lars Kuhtz <lars@kadena.io>
 copyright: Copyright (c) 2019-2023, Kadena LLC
 category: Data
 tested-with:
+    GHC==9.8
     GHC==9.6
     GHC==9.4
     GHC==9.2
     GHC==9.0
-    GHC==8.10
 extra-source-files:
     README.md
     CHANGELOG.md
@@ -86,7 +86,6 @@ benchmark benchmarks
         , deepseq >=1.4
         , hash-tree >=0.0
         , memory >=0.14
-        , mwc-random >=0.14
-        , random >=1.1
-        , random-bytestring >=0.1
+        , random >=1.2
+        , transformers >= 0.6
 

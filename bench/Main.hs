@@ -19,13 +19,13 @@
 -- Maintainer: Lars Kuhtz <lars@kadena.io>
 -- Stability: experimental
 --
--- TODO
---
 module Main
 ( main
 ) where
 
 import Control.DeepSeq
+import Control.Monad
+import Control.Monad.Trans.State.Strict
 
 import Criterion
 import Criterion.Main
@@ -35,16 +35,12 @@ import qualified "cryptonite" Crypto.Hash as CR
 
 import qualified Data.ByteArray as BA
 import qualified Data.ByteString as B
-import Data.ByteString.Random.MWC
 import qualified Data.HashTree as HT
 import Data.Maybe
 
 import GHC.Generics
 
-import Numeric.Natural
-
 import System.Random
-import qualified System.Random.MWC as MWC
 
 -- internal modules
 
@@ -55,7 +51,7 @@ import qualified Data.MerkleLog as ML
 
 main :: IO ()
 main = defaultMain
-    [ env globalEnv $ \ ~e -> bgroup "main"
+    [ env (return globalEnv) $ \ ~e -> bgroup "main"
         [ bgroup "create tree"
             [ bgroup "SHA512t_256"
                 [ createBench @(ML SHA512t_256) e
@@ -125,14 +121,12 @@ leafMaxSize = 1000
 
 type GlobalEnv = [B.ByteString]
 
-globalEnv :: IO GlobalEnv
-globalEnv = do
-    gen <- MWC.create
-    traverse (randomGen gen) (randomNats leafCount)
+globalEnv :: GlobalEnv
+globalEnv = evalState (replicateM leafCount genBytes) (mkStdGen 1)
   where
-
-randomNats :: Int -> [Natural]
-randomNats i = fmap fromIntegral $ take i $ randomRs @Int (0,leafMaxSize) $ mkStdGen 1
+    genBytes = do
+        len <- state $ randomR (0, leafMaxSize)
+        state $ genByteString len
 
 -- -------------------------------------------------------------------------- --
 -- Create Benchmark
